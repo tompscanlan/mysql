@@ -3,5 +3,5 @@
 mysql_pkgs:
   - mysql
 
-mysql_service: mysql
+mysql_service: mariadb
 mysql_conf_dir: "/etc/mysql/"

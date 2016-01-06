@@ -13,9 +13,15 @@
   environment: env
   when: ansible_os_family == 'Debian'
 
-- name: Copy the my.cnf file 
+- name: Install the mysql packages in Alpine derivatives
+  apk: name={{ item }} state=present update_cache=yes
+  with_items: mysql_pkgs
+  environment: env
+  when: ansible_os_family == 'Alpine'
+
+- name: Copy the my.cnf file
   template: src=my.cnf.{{ ansible_os_family }}.j2 dest={{ mysql_conf_dir }}/my.cnf
-  notify: 
+  notify:
    - restart mysql
 
 - name: Create the directory /etc/mysql/conf.d
@@ -33,7 +39,7 @@
    - 127.0.0.1
    - ::1
    - localhost
-  when: ansible_hostname != 'localhost' 
+  when: ansible_hostname != 'localhost'
 
 - name: update mysql root password for all root accounts
   mysql_user: name=root host={{ item }} password={{ mysql_root_db_pass }}
@@ -41,7 +47,7 @@
    - 127.0.0.1
    - ::1
    - localhost
-  when: ansible_hostname == 'localhost' 
+  when: ansible_hostname == 'localhost'
 
 - name: copy .my.cnf file with root password credentials
   template: src=.my.cnf.j2 dest=~/.my.cnf mode=0600
@@ -61,13 +67,13 @@
   when: mysql_db|lower() != 'none'
 
 - name: Create the database users
-  mysql_user: name={{ item.name }}  password={{ item.pass|default("foobar") }}  
+  mysql_user: name={{ item.name }}  password={{ item.pass|default("foobar") }}
                 priv={{ item.priv|default("*.*:ALL") }} state=present host={{ item.host | default("localhost") }}
   with_items: mysql_users
   when: mysql_users|lower() != 'none'
 
 - name: Create the replication users
-  mysql_user: name={{ item.name }}  host="%" password={{ item.pass|default("foobar") }}  
+  mysql_user: name={{ item.name }}  host="%" password={{ item.pass|default("foobar") }}
                 priv=*.*:"REPLICATION SLAVE" state=present
   with_items: mysql_repl_user
   when: mysql_repl_role == 'master'

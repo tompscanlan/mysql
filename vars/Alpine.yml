@@ -3,6 +3,8 @@
 mysql_pkgs:
   - mysql
   - openrc
+  - mariadb
+  - mariadb-dev
 
 mysql_service: mariadb
 mysql_conf_dir: "/etc/mysql/"

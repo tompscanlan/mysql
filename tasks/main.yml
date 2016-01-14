@@ -25,6 +25,10 @@
    - restart mysql
 
 
+- name: Install python mysql module
+  pip: name=MySQL-python
+  when: ansible_os_family == 'Alpine'
+
 - name: Create the directory /etc/mysql/conf.d
   file: path=/etc/mysql/conf.d state=directory
   notify:

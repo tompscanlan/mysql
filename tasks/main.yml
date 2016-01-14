@@ -25,8 +25,11 @@
    - restart mysql
 
 
-- name: Create the directory /etc/mysql/conf.d
-  file: path=/etc/mysql/conf.d state=directory
+- name: Create the directories
+  file: path={{ item }} state=directory
+  with_items:
+    - /etc/mysql/conf.d
+    - /var/run/mysqld
   notify:
    - restart mysql
 

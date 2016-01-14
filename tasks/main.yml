@@ -10,13 +10,13 @@
 - name: Install the mysql packages in Debian derivatives
   apt: name={{ item }} state=installed update_cache=yes
   with_items: mysql_pkgs
-  environment: env
+  environment: "{{ env }}"
   when: ansible_os_family == 'Debian'
 
 - name: Install the mysql packages in Alpine derivatives
   command: /sbin/apk add {{ item }}
   with_items: mysql_pkgs
-  environment: env
+  environment: "{{ env }}"
   when: ansible_os_family == 'Alpine'
 
 - name: Copy the my.cnf file

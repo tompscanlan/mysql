@@ -1,9 +1,9 @@
 ---
 
 mysql_pkgs:
-  - mysql
   - openrc
   - mariadb
+  - mariadb-client
   - mariadb-dev
 
 mysql_service: mariadb

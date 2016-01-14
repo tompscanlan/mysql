@@ -2,3 +2,7 @@
 - name: restart mysql
   service: name={{ mysql_service }} state=restarted
   when: ansible_os_family != 'Alpine'
+
+- name: restart mysql
+  command: /etc/init.d/mariadb restart
+  when: ansible_os_family == 'Alpine'

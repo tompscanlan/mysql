@@ -98,7 +98,7 @@
   when: mysql_users|lower() != 'none'
 
 - name: Create the replication users
-  mysql_user: name={{ item.name }}  host="%" password={{ item.pass|default("foobar") }} priv=*.*:"REPLICATION SLAVE" state=present
+  mysql_user: name={{ item.name }}  host="%" password={{ item.pass|default("foobar") }} priv="*.*:REPLICATION SLAVE" state=present
   with_items: mysql_repl_user
   when: mysql_repl_role == 'master'
 

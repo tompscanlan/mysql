@@ -51,8 +51,7 @@
    - 127.0.0.1
    - ::1
    - localhost
-  when: ansible_hostname == 'localhost'
-        and ansible_os_family != 'Alpine'
+  when: ansible_hostname == 'localhost' and ansible_os_family != 'Alpine'
 
 - name: copy .my.cnf file with root password credentials
   template: src=.my.cnf.j2 dest=~/.my.cnf mode=0600
@@ -71,29 +70,25 @@
 - name: Create the database's
   mysql_db: name={{ item.name }} state=present
   with_items: mysql_db
-  when: mysql_db|lower() != 'none'
-        and ansible_os_family != 'Alpine'
+  when: mysql_db|lower() != 'none' and ansible_os_family != 'Alpine'
 
 - name: Create the database users
   mysql_user: name={{ item.name }}  password={{ item.pass|default("foobar") }}
                 priv={{ item.priv|default("*.*:ALL") }} state=present host={{ item.host | default("localhost") }}
   with_items: mysql_users
-  when: mysql_users|lower() != 'none'
-        and ansible_os_family != 'Alpine'
+  when: mysql_users|lower() != 'none' and ansible_os_family != 'Alpine'
 
 - name: Create the replication users
   mysql_user: name={{ item.name }}  host="%" password={{ item.pass|default("foobar") }}
                 priv=*.*:"REPLICATION SLAVE" state=present
   with_items: mysql_repl_user
-  when: mysql_repl_role == 'master'
-        and ansible_os_family != 'Alpine'
+  when: mysql_repl_role == 'master' and ansible_os_family != 'Alpine'
 
 - name: Check if slave is already configured for replication
   mysql_replication: mode=getslave
   ignore_errors: true
   register: slave
-  when: mysql_repl_role == 'slave'
-        and ansible_os_family != 'Alpine'
+  when: mysql_repl_role == 'slave' and ansible_os_family != 'Alpine'
 
 - name: Ensure the hostname entry for master is available for the client.
   lineinfile: dest=/etc/hosts regexp="{{ mysql_repl_master }}" line="{{ hostvars[mysql_repl_master].ansible_default_ipv4.address + "   " + mysql_repl_master }}" state=present
@@ -103,10 +98,8 @@
   mysql_replication: mode=getmaster
   delegate_to: "{{ mysql_repl_master }}"
   register: repl_stat
-  when: slave|failed and mysql_repl_role == 'slave' and mysql_repl_master is defined
-        and ansible_os_family != 'Alpine'
+  when: slave|failed and mysql_repl_role == 'slave' and mysql_repl_master is defined and ansible_os_family != 'Alpine'
 
 - name: Change the master in slave to start the replication
   mysql_replication: mode=changemaster master_host={{ mysql_repl_master }} master_log_file={{ repl_stat.File }} master_log_pos={{ repl_stat.Position }} master_user={{ mysql_repl_user[0].name }} master_password={{ mysql_repl_user[0].pass }}
-  when: slave|failed and mysql_repl_role == 'slave' and mysql_repl_master is defined
-        and ansible_os_family != 'Alpine'
+  when: slave|failed and mysql_repl_role == 'slave' and mysql_repl_master is defined and ansible_os_family != 'Alpine'

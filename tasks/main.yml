@@ -30,12 +30,29 @@
   notify:
    - restart mysql
 
+- name: Create the directory /run/openrc
+  file: path=/run/openrc state=directory
+  when: ansible_os_family == 'Alpine'
+
+- name: Set softlevel for openrc
+  command: touch /run/openrc/softlevel
+  when: ansible_os_family == 'Alpine'
+
+- name: Setup openrc
+  command: openrc
+  when: ansible_os_family == 'Alpine'
+
 - name: Setup mysql on Alpine
   command: /etc/init.d/mariadb setup
   when: ansible_os_family == 'Alpine'
 
+- name: Start mysql on Alpine
+  command: /etc/init.d/mariadb start
+  when: ansible_os_family == 'Alpine'
+
 - name: Start the mysql services Redhat
   service: name={{ mysql_service }} state=started enabled=yes
+  when: ansible_os_family == 'RedHat' or ansible_os_family == 'Debian'
 
 - name: update mysql root password for all root accounts
   mysql_user: name=root host={{ item }} password={{ mysql_root_db_pass }}
